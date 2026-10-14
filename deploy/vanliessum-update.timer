@@ -1,0 +1,14 @@
+[Unit]
+Description=Vanliessum.io VPS update poll (every 45s)
+Documentation=file:///opt/vanliessum/deploy/README.md
+Requires=vanliessum-update.service
+
+[Timer]
+OnBootSec=60s
+OnUnitInactiveSec=45s
+AccuracySec=5s
+Persistent=true
+Unit=vanliessum-update.service
+
+[Install]
+WantedBy=timers.target
