@@ -1,0 +1,51 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vanliessum-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, blackadder-vanliessum]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Request host deploy
+        run: |
+          set -euo pipefail
+          SPOOL=/spool
+          if [ ! -d "$SPOOL" ]; then
+            echo "host deploy spool is not mounted" >&2
+            exit 1
+          fi
+          umask 022
+          printf 'repo=rliessum/vanliessum.io-d571f\nsha=%s\nrun_id=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" >"$SPOOL/request.$GITHUB_RUN_ID"
+          for i in $(seq 1 900); do
+            if [ -f "$SPOOL/result.$GITHUB_RUN_ID" ]; then
+              cat "$SPOOL/result.$GITHUB_RUN_ID"
+              grep -q '^ok=1$' "$SPOOL/result.$GITHUB_RUN_ID"
+              exit $?
+            fi
+            sleep 1
+          done
+          echo "timed out waiting for the host deploy" >&2
+          exit 1
