@@ -43,14 +43,7 @@ const currentYear = new Date().getFullYear();
     <meta name="generator" content={Astro.generator} />
     
     <!-- Dark mode: check localStorage, default to dark -->
-    <script is:inline>
-      (function() {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'light') {
-          document.documentElement.classList.remove('dark');
-        }
-      })();
-    </script>
+    <script src="/theme.js"></script>
   </head>
   <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased transition-colors duration-200 dark:bg-zinc-950 dark:text-zinc-100">
     <div class="mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-12 sm:py-16">
@@ -83,33 +76,5 @@ const currentYear = new Date().getFullYear();
         </p>
       </footer>
     </div>
-    
-    <script is:inline>
-      (function() {
-        const toggle = document.getElementById('theme-toggle');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
-        
-        function updateIcons() {
-          const isDark = document.documentElement.classList.contains('dark');
-          sunIcon.classList.toggle('hidden', isDark);
-          moonIcon.classList.toggle('hidden', !isDark);
-        }
-        
-        updateIcons();
-        
-        toggle.addEventListener('click', function() {
-          const isDark = document.documentElement.classList.contains('dark');
-          if (isDark) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-          } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-          }
-          updateIcons();
-        });
-      })();
-    </script>
   </body>
 </html>
